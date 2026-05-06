@@ -33,3 +33,28 @@ class PrestamoController:
         if not eliminado:
             return {"success": False, "message": "No se puede cancelar (no existe o ya fue procesada)"}
         return {"success": True, "message": "Solicitud cancelada correctamente"}
+
+    async def promedio_cuota(self, user_id: str) -> dict:
+        data = service.calcular_promedio_cuota(user_id)
+        return {
+            "success": True,
+            "data": data,
+            "nota_integridad": (
+                "Los valores cuota_registrada fueron calculados con fórmula TEA/12 "
+                "durante el período 01/2024-08/2024. Usar cuota_correcta para reportes "
+                "y decisiones de cartera."
+            )
+        }
+
+    async def cuota_mas_alta(self, user_id: str) -> dict:
+        data = service.obtener_cuota_mas_alta(user_id)
+        if not data:
+            return {"success": False, "message": "Sin solicitudes registradas"}
+        return {
+            "success": True,
+            "data": data,
+            "nota_integridad": (
+                "cuota_registrada corresponde al período con fórmula incorrecta. "
+                "Usar cuota_correcta para evaluación de capacidad de pago."
+            )
+        }

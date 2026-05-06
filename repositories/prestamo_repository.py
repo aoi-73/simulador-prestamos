@@ -47,3 +47,25 @@ class PrestamoRepository:
             .eq("estado", "pendiente") \
             .execute()
         return len(response.data) > 0
+
+    def obtener_datos_para_recalculo(self, user_id: str) -> list:
+        """
+        Trae los campos necesarios para recalcular la cuota con TEM.
+        NO trae cuota_mensual porque ese campo está contaminado.
+        El Service es quien calcula — el Repository solo provee los datos fuente.
+        """
+        response = supabase.table("solicitudes_prestamo") \
+            .select("id, monto, plazo_meses, tasa_anual, cuota_mensual, estado") \
+            .eq("user_id", user_id) \
+            .execute()
+        return response.data
+
+    def obtener_datos_para_recalculo_uno(self, user_id: str) -> dict:
+        """Trae la solicitud con mayor cuota registrada para recalcular."""
+        response = supabase.table("solicitudes_prestamo") \
+            .select("id, monto, plazo_meses, tasa_anual, cuota_mensual") \
+            .eq("user_id", user_id) \
+            .order("cuota_mensual", desc=True) \
+            .limit(1) \
+            .execute()
+        return response.data[0] if response.data else None
