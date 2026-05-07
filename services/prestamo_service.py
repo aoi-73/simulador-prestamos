@@ -10,7 +10,7 @@ class PrestamoService:
         C = P * [r(1+r)^n] / [(1+r)^n - 1]
         Donde: P = monto, r = tasa mensual decimal, n = plazo en meses
         """
-        r      = (tasa_anual / 100) / 12
+        r      = (1 + (tasa_anual / 100)) ** (1 / 12) - 1
         factor = (1 + r) ** plazo
         cuota  = monto * (r * factor) / (factor - 1)
         total  = cuota * plazo
